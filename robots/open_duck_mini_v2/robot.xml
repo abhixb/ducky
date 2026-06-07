@@ -48,11 +48,14 @@
     <mesh name="right_antenna_holder" file="right_antenna_holder.stl"/>
   </asset>
   <default>
-    <geom contype="1" conaffinity="1"/>
-    <!-- <joint damping="1.44" frictionloss="0.19" armature="0.012"/>
-    <position kp="19.6" kv="0.0" forcerange="-3.69 3.69"/> -->
-    <joint damping="1.0" frictionloss="0.01" armature="0.01"/>
-    <position kp="9.5" kv="0.0" forcerange="-5.2 5.2"/>
+    <!-- Geoms are visual-only by default; collision class enables floor contact. -->
+    <geom contype="0" conaffinity="0" group="2"/>
+    <!-- BAM hardware-identified Feetech STS3215 leg-servo parameters. -->
+    <joint damping="1.44" frictionloss="0.19" armature="0.012"/>
+    <position kp="19.6" kv="0.0" forcerange="-3.69 3.69"/>
+    <default class="collision">
+      <geom contype="1" conaffinity="1" group="3"/>
+    </default>
   </default>
   <contact>
     <exclude name="exclude1" body1="trunk_assembly" body2="neck_yaw_assembly"/>
@@ -67,11 +70,11 @@
     <exclude name="exclude10" body1="head_pitch_to_yaw" body2="head_assembly"/>
   </contact>
   <worldbody>
-    <!-- <body name="base" pos="0 0 0.22"> -->
-    <body name="base" pos="0 0 0.4">
-      <!-- <freejoint /> -->
+    <body name="base" pos="0 0 0.195">
+      <freejoint name="floating_base"/>
       <body name="trunk_assembly">
         <inertial pos="-0.0483259 -9.97823e-05 0.0384971" quat="0.505499 0.490695 0.496207 0.507413" mass="0.698526" diaginertia="0.00344489 0.00292719 0.00167606"/>
+        <site name="imu" pos="-0.024 0 0.088" size="0.005"/>
         <geom pos="-0.019 0 0.0648909" type="mesh" rgba="0.917647 0.917647 0.917647 1" mesh="body_front"/>
         <geom pos="-0.1263 -0.0257 0.0576079" quat="0.5 0.5 -0.5 0.5" type="mesh" rgba="0.615686 0.811765 0.929412 1" mesh="usb_c_charger"/>
         <geom pos="-0.019 0 0.0648909" type="mesh" rgba="0.917647 0.917647 0.917647 1" mesh="body_back"/>
@@ -156,6 +159,9 @@
                   <geom pos="0.01656 0.2228 0.10955" quat="0.707107 -0.707107 0 0" type="mesh" rgba="0.305882 0.298039 0.278431 1" mesh="foot_bottom_tpu"/>
                   <geom pos="0.01656 0.2228 0.10955" quat="0.707107 -0.707107 0 0" type="mesh" rgba="0.305882 0.298039 0.278431 1" mesh="foot_bottom_pla"/>
                   <geom pos="0.01606 0.2223 0.10905" quat="0.707107 -0.707107 0 0" type="mesh" rgba="0.980392 0.713726 0.00392157 1" mesh="foot_top"/>
+                  <geom class="collision" pos="0.01606 0.2223 0.10905" quat="0.707107 -0.707107 0 0" type="mesh" mesh="foot_side"/>
+                  <geom class="collision" pos="0.01656 0.2228 0.10955" quat="0.707107 -0.707107 0 0" type="mesh" mesh="foot_bottom_tpu"/>
+                  <site name="left_foot_touch" type="box" pos="-0.0195 -0.031225 0.02955" quat="0.707107 -0.707107 0 0" size="0.08 0.03 0.04" rgba="1 0 0 0"/>
                   <body name="left_foot" pos="0.0005 -0.036225 0.01955" quat="0.707107 -0.707107 0 0">
                     <inertial pos="0 0 0" mass="1e-09" diaginertia="0 0 0"/>
                   </body>
@@ -271,6 +277,9 @@
                   <geom pos="0.01656 0.2228 0.10955" quat="0.707107 -0.707107 0 0" type="mesh" rgba="0.305882 0.298039 0.278431 1" mesh="foot_bottom_tpu"/>
                   <geom pos="0.01656 0.2228 0.10955" quat="0.707107 -0.707107 0 0" type="mesh" rgba="0.305882 0.298039 0.278431 1" mesh="foot_bottom_pla"/>
                   <geom pos="0.01606 0.2223 0.10905" quat="0.707107 -0.707107 0 0" type="mesh" rgba="0.980392 0.713726 0.00392157 1" mesh="foot_top"/>
+                  <geom class="collision" pos="0.01606 0.2223 0.10905" quat="0.707107 -0.707107 0 0" type="mesh" mesh="foot_side"/>
+                  <geom class="collision" pos="0.01656 0.2228 0.10955" quat="0.707107 -0.707107 0 0" type="mesh" mesh="foot_bottom_tpu"/>
+                  <site name="right_foot_touch" type="box" pos="-0.0195 -0.031225 0.02955" quat="0.707107 -0.707107 0 0" size="0.08 0.03 0.04" rgba="1 0 0 0"/>
                   <body name="right_foot" pos="0.0005 -0.036225 0.01955" quat="0.707107 -0.707107 0 0">
                     <inertial pos="0 0 0" mass="1e-09" diaginertia="0 0 0"/>
                   </body>
@@ -300,4 +309,19 @@
     <position name="right_knee"      joint="right_knee"      inheritrange="1"/>
     <position name="right_ankle"     joint="right_ankle"     inheritrange="1"/>
   </actuator>
+  <sensor>
+    <framequat   name="orientation"   objtype="site" objname="imu"/>
+    <gyro        name="gyro"          site="imu"/>
+    <accelerometer name="accelerometer" site="imu"/>
+    <velocimeter name="local_linvel"  site="imu"/>
+    <framepos    name="base_pos"      objtype="site" objname="imu"/>
+    <touch       name="left_foot_touch"  site="left_foot_touch"/>
+    <touch       name="right_foot_touch" site="right_foot_touch"/>
+  </sensor>
+  <keyframe>
+    <!-- Standing crouch: floating base + bent-knee leg pose, head/antennas neutral. -->
+    <key name="home"
+         qpos="0 0 0.178 1 0 0 0 0 0 -0.5 1.0 -0.5 0 0 0 0 0 0 0 0 0.5 1.0 -0.5"
+         ctrl="0 0 -0.5 1.0 -0.5 0 0 0 0 0 0 0 0 0.5 1.0 -0.5"/>
+  </keyframe>
 </mujoco>

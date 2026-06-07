@@ -1,9 +1,7 @@
 <mujoco model="bd1 scene">
-	<!-- 100 hz -->
-	<!-- <option timestep="0.01"/> -->
-	<!-- <statistic center="0 0 0.55" extent="1.1" /> -->
-	<!-- <include file="robot.xml" /> -->
-	<include file="robot_motors.xml" />
+	<!-- 200 Hz physics; control decimated to 50 Hz in the env. -->
+	<option timestep="0.005"/>
+	<include file="robot.xml" />
 	<default>
 		<!-- sliding friction, torsional friction, rolling friction -->
 		<!-- <geom friction="3.0 0.1 0.006"/> -->
